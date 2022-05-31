@@ -48,7 +48,7 @@ def make_exec_list(exec_detection, exec_tracking, exec_visualization):
         exec_list.append('show_tracks')  
     return exec_list
 
-# help function to save image to file also save image to video for report
+# help function to save image to file also save image to video for report 
 def save_video(file_name):
     img = cv2.imread(filename=file_name)
     frame_height,frame_width,depth = img.shape
