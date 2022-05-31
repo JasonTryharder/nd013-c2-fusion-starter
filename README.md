@@ -35,12 +35,12 @@ Depend on the system architechture and the type of NN selected as detector, data
 	- map each individual channel of range image to 8bit data and threshold the object of interest to the middle part of dynamic range( by eliminating lidar registed data outliers)  
  	- convert range image(Waymo data format) to pcl( point cloud)  
 Below shows intensity channel of ***cropped, 8bit*** image consist of the BEV image   
-[![BEV_intensity_img_step2.mp4](/summary_related/BEV_intensity_img_step2_thumbnail.png)](/summary_related/BEV_intensity_img_step2.mp4)
+[![BEV_intensity_img_step2.mp4](/summary_related/BEV_intensity_img_step2_thumbnail.png)](/summary_related/BEV_intensity_img_step2.mp4)  
 Below shows height channel of ***cropped, 8bit*** image consist of the BEV image   
 [![BEV_height_img_step2.mp4](/summary_related/BEV_height_img_step2_thumbnail.png)](/summary_related/BEV_height_img_step2.mp4)  
 Notice height and intensity channel have different emphasis on the detected objects  
 	- convert pcl to BEV(birds eye view) 
-![BEV_stacked_img_step2.mp4](/summary_related/BEV_stacked_img_step2.mp4)
+[![BEV_stacked_img_step2.mp4](/summary_related/BEV_stacked_img_step2_thumbnail.png)](/summary_related/BEV_stacked_img_step2.mp4)
 3. detector  
 There is various processing pipeline for object detection and classification based on point-clouds. The pipeline structure summarized(credit: [Udacity](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/cbe1917f-ffe4-4b8c-87b8-11edb85d79ff/concepts/39e780c5-e37e-43ba-9b48-dca8b4a67a7d)) consists of three major steps, which are   
 	(1) data representation  
@@ -58,7 +58,7 @@ With the prevalence of convolutional neural networks (CNN) in object detection, 
 - Pillar-based data representation : the point cloud is clustered not into cubic volume elements but instead into vertical columns rising up from the ground up. [PointPillars](https://arxiv.org/abs/1812.05784)  
 	- advantage: Segmenting the point cloud into discrete volume elements saves memory resources  
 - Frustum-based data representation : When combined with another sensor such as a camera, lidar point clouds can be clustered based on pre-detected 2d objects, such as vehicles or pedestrians. If the 2d region around the projection of an object on the image plane is known, a frustum can be projected into 3D space using both the internal and the external calibration of the camera. One method belonging to this class is e.g.[Frustum PointNets](https://arxiv.org/pdf/1711.08488v1.pdf). The following figure illustrates the principle.  
-![Frustum_pointcloud_processing.png](/summary_related/Frustum_pointcloud_processing.png)
+![Frustum_pointcloud_processing.png](/summary_related/Frustum_pointcloud_processing.png)  
 	- advantage: cluster lidar point using camera pre-detected region, noise reduction and increase accuracy, also save memory on saving point cloud   
 	- disadvantage: requires a second sensor such as camera for pre-detection, however, camera been onboard selfdriving car is almost guaranteed   
 - Projection-based data representation : While both voxel- and pillar-based algorithms cluster the point-cloud based on a spatial proximity measure, projection-based approaches reduce the dimensionality of the 3D point cloud along a specified dimension, there are three major approaches can be identified: front view (RV), range view (RV) and bird's eye view (BEV).  
@@ -73,17 +73,15 @@ Point-wise feature extractors : PointNet uses the the entire point cloud as inpu
 Segment-wise feature extractors : The term "segment-wise" refers to the way how the point cloud is divided into spatial clusters (e.g. voxels, pillars or frustums). Once this has been done, a classification model is applied to each point of a segment to extract suitable volumetric features.One of the most-cited representatives of this class of feature extractors is VoxelNet. In a nutshell, the idea of [VoxelNet](https://arxiv.org/abs/1711.06396) is to encode each voxel via an architecture called "Voxel Feature Extractor (VFE)" and then combine local voxel features using 3D convolutional layers and then transform the point cloud into a high dimensional volumetric representation. Finally, a region proposal network processes the volumetric representation and outputs the actual detection results.[link](https://github.com/qianguih/voxelnet) to algorithm  
 Convolutional Neural Networks (CNN): In recent years, many of the approaches for image-based object detection have been successfully transferred to point cloud processing. In most cases, the backbone networks used for image-based object detection can be directly used for point clouds as well. In order to balance between detection accuracy and efficiency, the type of backbones can be chosen between deeper and densely connected networks or lightweight variants with few connections.
 #### Step 3 : Detection and Prediction Refinement
-Once features have been extracted from the input data, a detection network is needed to generate contextual features (e.g. object class, bounding box) and finally output the model predictions. Depending on the architecture, the detection process can either perform a single-pass or a dual-pass. Based on the detector network architecture, the available types can be broadly organized into two classes, which are dual-stage encoders such as [R-CNN](https://arxiv.org/pdf/1311.2524.pdf), [Faster R-CNN](https://papers.nips.cc/paper/2015/file/14bfa6bb14875e45bba028a21ed38046-Paper.pdf) or [PointRCNN](https://arxiv.org/abs/1812.04244) or single-stage encoders such as [YOLO](https://arxiv.org/abs/1506.02640) or [SSD](https://arxiv.org/abs/1512.02325). In general, single-stage encoders are faster than dual-stage encoders, which makes them more suited for real-time applications such as autonomous driving.
-
-This project uses [Complex Yolo](https://arxiv.org/abs/1803.06199) and [Super Fast and Accurate 3D Object Detection based on 3D LiDAR Point Clouds](https://github.com/maudzung/SFA3D) for real time 3D object detection on point clouds,As can be seen from the following figure, the main pipeline of Complex YOLO consists of three steps:
-	1. Transforming the point cloud into a bird's eye view (BEV)
-	2. Complex YOLO on BEV map
-	3. 3D bounding box re-conversion
-One of the aspects that makes Complex YOLO special is the extension of the classical Grid RPN approach, which estimates only bounding box location and shape, by an orientation angle, which it encodes as a complex angle in Euler notation (hence the name "E-RPN") such that the orientation may be reconstructed as \mathrm{arctan2}(Im,Re)arctan2(Im,Re).
-![complexYOLO_pipeline.png](/summary_related/complexYOLO_pipeline.png)
-Below video demonstrates complex YOLO detection with labels(ground truth) drawn. Also note that in this project, we are only focussing on the detection of vehicles, even though the Waymo Open dataset contains labels for other road users as well.
-[![label_vs_detected_object_Thumbnail.png](/summary_related/label_vs_detected_object_Thumbnail.png)](/summary_related/label_vs_detected_object.mp4)
-
+Once features have been extracted from the input data, a detection network is needed to generate contextual features (e.g. object class, bounding box) and finally output the model predictions. Depending on the architecture, the detection process can either perform a single-pass or a dual-pass. Based on the detector network architecture, the available types can be broadly organized into two classes, which are dual-stage encoders such as [R-CNN](https://arxiv.org/pdf/1311.2524.pdf), [Faster R-CNN](https://papers.nips.cc/paper/2015/file/14bfa6bb14875e45bba028a21ed38046-Paper.pdf) or [PointRCNN](https://arxiv.org/abs/1812.04244) or single-stage encoders such as [YOLO](https://arxiv.org/abs/1506.02640) or [SSD](https://arxiv.org/abs/1512.02325). In general, single-stage encoders are faster than dual-stage encoders, which makes them more suited for real-time applications such as autonomous driving.  
+This project uses [Complex Yolo](https://arxiv.org/abs/1803.06199) and [Super Fast and Accurate 3D Object Detection based on 3D LiDAR Point Clouds](https://github.com/maudzung/SFA3D) for real time 3D object detection on point clouds,As can be seen from the following figure, the main pipeline of Complex YOLO consists of three steps:  
+	1. Transforming the point cloud into a bird's eye view (BEV)  
+	2. Complex YOLO on BEV map  
+	3. 3D bounding box re-conversion  
+One of the aspects that makes Complex YOLO special is the extension of the classical Grid RPN approach, which estimates only bounding box location and shape, by an orientation angle, which it encodes as a complex angle in Euler notation (hence the name "E-RPN") such that the orientation may be reconstructed as \mathrm{arctan2}(Im,Re)arctan2(Im,Re).  
+![complexYOLO_pipeline.png](/summary_related/complexYOLO_pipeline.png)  
+Below video demonstrates complex YOLO detection with labels(ground truth) drawn. Also note that in this project, we are only focussing on the detection of vehicles, even though the Waymo Open dataset contains labels for other road users as well.  
+[![label_vs_detected_object_Thumbnail.png](/summary_related/label_vs_detected_object_Thumbnail.png)](/summary_related/label_vs_detected_object.mp4)  
 4. Evaluating Object Detectors
 Object detection algorithms need to perform two main tasks, which are
 - to decide whether an object exists in the scene and
