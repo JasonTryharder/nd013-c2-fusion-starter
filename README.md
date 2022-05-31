@@ -3,6 +3,8 @@ This project demonstrated a implementation of object detection using deep learni
 [![label_vs_detected_object_Thumbnail.png](/summary_related/label_vs_detected_object_Thumbnail.png)](/summary_related/label_vs_detected_object.mp4)  
 ### The following diagram illustrates the API data flow, and steps makes up the detection and tracking functions  
 ![System_Detection_and_Tracking.png](/summary_related/System_Detection_and_Tracking.png)  
+### setup for local environment 
+refer to instruction provided in this [link](https://github.com/JasonTryharder/nd013-c2-fusion-starter/blob/main/setup_README.md#installation-instructions-for-running-locally)
 ### For detection tasks, API will provide:  
 1. data visulization  
 Depend on the dataset/sensor set of choice, data format will vary, some exploratory analysis on the data is beneficial to understand the challenge of the project  
