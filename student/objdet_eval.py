@@ -68,7 +68,8 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
                 dist_x,dist_y,dist_z = np.sqrt((label_center-det_center)*(label_center-det_center))
                 ## step 5 : compute the intersection over union (IOU) between label and detection bounding-box
                 intersection = det_poly.intersection(label_obj_poly)
-                overlap = intersection.area / label_obj_poly.area
+                union = det_poly.union(label_obj_poly)
+                overlap = intersection.area / union.area
                 ## step 6 : if IOU exceeds min_iou threshold, store [iou,dist_x, dist_y, dist_z] in matches_lab_det and increase the TP count
                 if overlap > min_iou:
                     matches_lab_det.append([overlap,dist_x,dist_y,dist_z]) 
