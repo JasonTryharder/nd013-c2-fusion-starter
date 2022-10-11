@@ -39,7 +39,7 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
     ax.cla()
     ax2.cla()
     ax2.imshow(image)
-    
+    print("1 -------------------------  ",fig)
     # plot tracks, measurements and ground truth in birds-eye view
     for track in track_list:
         if state == None or track.state == state: # plot e.g. only confirmed tracks
@@ -132,7 +132,6 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
             p = patches.PathPatch(
                 path, fill=False, color=col, linewidth=3)
             ax2.add_patch(p)
-        
     # plot labels
     for label, valid in zip(lidar_labels, lidar_labels_valid):
         if valid:        
@@ -141,9 +140,7 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
     for meas in meas_list:
         ax.scatter(-1*meas.z[1], meas.z[0], color='blue', marker='.', label='measurement')
     
-    # maximize window        
-    mng = plt.get_current_fig_manager()
-    mng.frame.Maximize(True)
+
     
     # axis 
     ax.set_xlabel('y [m]')
@@ -155,6 +152,10 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
     ticks_x = ticker.FuncFormatter(lambda x, pos: '{0:g}'.format(-x) if x!=0 else '{0:g}'.format(x))
     ax.xaxis.set_major_formatter(ticks_x)
     
+    
+    # # maximize window        
+    mng = plt.get_current_fig_manager()
+    mng.frame.Maximize(True)
     # remove repeated labels
     handles, labels = ax.get_legend_handles_labels()
     handle_list, label_list = [], []
@@ -163,9 +164,9 @@ def plot_tracks(fig, ax, ax2, track_list, meas_list, lidar_labels, lidar_labels_
             handle_list.append(handle)
             label_list.append(label)
     ax.legend(handle_list, label_list, loc='center left', shadow=True, fontsize='x-large', bbox_to_anchor=(0.8, 0.5))
-
+    # change delay to 1 second if save to video
     plt.pause(0.01)
-    
+    print("3 -------------------------  ",fig)
     return fig, ax, ax2
 
 
@@ -236,12 +237,15 @@ def make_movie(path):
     height, width, layers = frame.shape
 
     # save with 10fps to result dir
-    video = cv2.VideoWriter(os.path.join(path, 'my_tracking_results.avi'), 0, 10, (width,height))
+    # codec = cv2.VideoWriter_fourcc(*'mp4v')
+    codec = 0
+    video = cv2.VideoWriter(os.path.join(path, 'my_tracking_results.avi'), codec, 10, (width,height))
 
     for image in images:
         fname = os.path.join(path, image)
         video.write(cv2.imread(fname))
         os.remove(fname) # clean up
 
-    cv2.destroyAllWindows()
+
     video.release()
+    cv2.destroyAllWindows()

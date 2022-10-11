@@ -47,8 +47,21 @@ class Track:
                         [0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00, 0.0e+00],
                         [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00],
                         [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+01]])
-        self.state = 'confirmed'
-        self.score = 0
+        # use measurement to update the state
+        pos_sens = np.ones((4, 1)) # homogeneous coordinates
+        pos_sens[0:3] = meas.z 
+        pos_veh = meas.sensor.sens_to_veh*pos_sens # transform from lidar to vehicle  coordinates
+        self.x[0:3] = pos_veh[0:3]
+        # position estimation error covariance matrix can be initialized from measurement covariance by rotating from sensor to vehicle
+        P_pos = M_rot * meas.R * np.transpose(M_rot)
+        self.P[0:3,0:3] = P_pos
+        # velocity estimation error covariation matrix can be initialized using some large value to account for the uncertainty 
+        self.P[3,3] = (params.sigma_p44)^2
+        self.P[4,4] = (params.sigma_p55)^2
+        self.P[5,5] = (params.sigma_p66)^2
+    
+        self.state = 'initialized'
+        self.score = 0.5/float(params.window)
         
         ############
         # END student code
@@ -101,16 +114,30 @@ class Trackmanagement:
         ############
         
         # decrease score for unassigned tracks
-        for i in unassigned_tracks:
-            track = self.track_list[i]
-            # check visibility    
+        j = 0 # to account for track deletion 
+        for track_index in unassigned_tracks:
+            # index = i - j
+            track = self.track_list[track_index-j]
+            # check visibility
             if meas_list: # if not empty
                 if meas_list[0].sensor.in_fov(track.x):
                     # your code goes here
-                    pass 
-
-        # delete old tracks   
-
+                    track.score = (track.score * params.window - 0.5)/float(params.window) 
+                    print("decrease score :", track.id, " : ", track.score)
+                # delete old tracks   
+                if track.state == 'confirmed':
+                    if track.score < params.delete_threshold:
+                        print("deleting track :", track.id, " reason 1 -----------------------------------------: ", track.score)
+                        self.delete_track(track)
+                        j = j+1
+                        
+                else:
+                    if track.P[0,0] > params.max_P or track.P[1,1] > params.max_P or track.score < 0.05:
+                        print("deleting track :", track.id, " reason 2 -----------------------------------------: ", track.score)
+                        if track.P[0,0] > params.max_P or track.P[1,1] > params.max_P :
+                            print(" max P bigger than ", params.max_P, track.P[0,0] , "  ", track.P[1,1] )
+                        self.delete_track(track)
+                        j = j+1
         ############
         # END student code
         ############ 
@@ -139,9 +166,17 @@ class Trackmanagement:
         # - increase track score
         # - set track state to 'tentative' or 'confirmed'
         ############
-
-        pass
-        
+        # track.score is capped at 1.0
+        if abs(1 - track.score)>1e-3:
+            track.score = (track.score*params.window + 0.5)/float(params.window)
+            print("increasing track score ", track.id, " : ", track.score)
+        else:
+            track.score = 1.0
+        # track.score = (track.score*params.window + 1.0)/params.window
+        if track.score > params.confirmed_threshold : 
+            track.state = 'confirmed'
+        else:
+            track.state = "tentative"
         ############
         # END student code
         ############ 
