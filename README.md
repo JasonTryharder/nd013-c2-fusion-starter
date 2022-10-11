@@ -1,6 +1,6 @@
 # Lidar and camera fusion  
 This project demonstrated a implementation of object detection using a trained model using complex-yolo or  , and tracking using EKF to fuse lidar and camera detections  
-[![label_vs_detected_object_Thumbnail.png](/summary_related/label_vs_detected_object_Thumbnail.png)](/summary_related/label_vs_detected_object.gif)  
+![label_vs_detected_object_Thumbnail.png](/summary_related/label-vs-detected-object.gif)  
 ### The following diagram illustrates the project data flow, and steps makes up the detection and tracking functions  
 ![System_Detection_and_Tracking.png](/summary_related/System_Detection_and_Tracking.png) 
 ![Tracking_flow_zoomin](/summary_related/EKF_flow.png) 
@@ -39,12 +39,12 @@ Depend on the system architechture and the type of NN selected as detector, data
 	2.2 Map each individual channel of range image to 8bit data and threshold the object of interest to the middle part of dynamic range( by eliminating lidar registed data outliers)  
 	2.3 Convert range image(Waymo data format) to pcl( point cloud)  
         - Below shows **intensity** channel of cropped, 8bit image consist of the BEV image   
-[![BEV_intensity_img_step2](/summary_related/BEV_intensity_img_step2_thumbnail.png)](/summary_related/BEV_intensity_img_step2.gif)  
+![BEV_intensity_img_step2](/summary_related/BEV-intensity-img-step2.gif)  
         - Below shows **height** channel of cropped, 8bit image consist of the BEV image   
-[![BEV_height_img_step2](/summary_related/BEV_height_img_step2_thumbnail.png)](/summary_related/BEV_height_img_step2.gif)  
+![BEV_height_img_step2](/summary_related/BEV_height_img_step2.gif)  
 Notice height and intensity channel have different emphasis on the detected objects  
         - Convert pcl to BEV(birds eye view) 
-[![BEV_stacked_img_step2](/summary_related/BEV_stacked_img_step2_thumbnail.png)](/summary_related/BEV_stacked_img_step2.gif)
+![BEV_stacked_img_step2](/summary_related/BEV_stacked_img_step2.gif)
 1. Detector  
 There is various processing pipeline for object detection and classification based on point-clouds. The pipeline structure summarized(credit: [Udacity](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/cbe1917f-ffe4-4b8c-87b8-11edb85d79ff/concepts/39e780c5-e37e-43ba-9b48-dca8b4a67a7d)) consists of three major steps, which are   
 	3.1 Data representation  
@@ -124,7 +124,7 @@ Notice all metrics should be perfect since detector is by passed and using groun
 	7.8 Below video demonstrates complex YOLO detection with labels(ground truth) drawn. Also note that in this project, we are only focussing on the detection of vehicles, even though the Waymo Open dataset contains labels for other road users as well.  
 ![label_vs_detected_object_Thumbnail](/summary_related/label_vs_detected_object.gif)
 
-1. Tracking algorithm is tested using pre-recorded frames using **fpn_resnet only**, due to darknet model does not provide hight label, two test result is plotted: 
+8. Tracking algorithm is tested using pre-recorded frames using **fpn_resnet only**, due to darknet model does not provide hight label, two test result is plotted: 
 	8.1 Use camera and lidar detection together, one can observe there are three tracks get consistent detection and tracking, the detection accuracy measured using RMSE can stay below 0.4 all the time, this definetly will help increase tracking robustness
 ![RMSE_camera_lidar](/summary_related/RMSE_with_camera.png)
 	8.2 Use lidar alone the tracking algorithm still showed strong robustness, it tracks the same 3 tracks only with slight higher RMSE error, however, using extra sensor(lidar) is strongly preferred, since with more sensor can increase tracking capability for other object such as human, cyclist, animals. also, camera can provide more contextual information such as sementic infomation
