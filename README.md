@@ -66,39 +66,40 @@ Specifically kalman filter will perform the following:
    	    - Measurement update: </br>
 ![KF_equ](/summary_related/KF_measurement.png)</br>
         - measurement equation for camera from a 6D(x,y,z,vx,vy,vz) vector to 2D(x,y) is non-linear 
-![KF_measurement_camera_1](/summary_related/measurement_equ_camera_1.png)</br>
+![KF_measurement_camera_1](/summary_related/measurement_equ_camera_1.png)    
 	4.4 In case of a camera measurement, use the **nonlinear measurement model** and calculate the new Jacobian, otherwise use the **linear measurement model** to update state and covariance.
 note: kalman filter assumes linear mapping matrix for the state transition matrix and measurement update matrix, EKF and UKF are ways to obtain a linear representation at non-linear situation, such as variant speed(with acceleration) or camera measurement model  
-note: to get a linear representation of non-linear equation, we used multivariant taylor expansion(first order), so there is a Jacobian matrix is needed for first exapnsion  
+note: to get a linear representation of non-linear equation, we used multivariant taylor expansion(first order), so there is a Jacobian matrix is needed for first exapnsion     
 ![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)
         - Below is a setup for 2x6 Jacobian
 ![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)
 ![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)
-        - KF parameter definition: </br>
-![KF_equ](/summary_related/KF_Definition.png)</br>
+        - KF parameter definition:     
+![KF_equ](/summary_related/KF_Definition.png)     
 
 
-5. Track Management:
-A multi-target tracking system has to fulfill the following tasks in addition to a single-target tracking:
-	5.1 Initialize new tracks
-      	- Before measurement can be tracked against tracks, track has to be initialized first, depending on first received measurement been camera or lidar, choice is at engineer's hand how to use populate the tracks, eg wait several measurement to initialize nad can get velocity as well or, disgard camera and wait for lidar so state has distance
-![track_mgr_init_0](/summary_related/track_mgr_init_0.png)
-    	- Covariance matrix also need to be initialized, based on sensor to vehicle transformation, also error term should also reflect the initial state, such as velocity estimation error can be larger to reflect the lack of velocity measurement update 
-![track_mgr_init_1](/summary_related/track_mgr_init_1.png)
-	5.2 Delete old tracks
-		- Tack management should also be able to delet old tracks that their score is below certain threshold to stop tracking
-	5.3 Assign some confidence value to a track
-     	- A track scoring system can help to keep track of tracks and provide metrics(confidence) for track deletion, many heuristic method is implemented here. approach implemented in this project is detection in the last 6 frames over number of frames(6), and a state name("initialized", "tentative", "confirmed") is assigned based on score and wether the track is new or not, and when to delete a track, this extra information is not mandantory but it can help the track management keep better track of things</br>
-![track_mgr_init_1](/summary_related/track_mgr_score.png)
-6. Track/measurement Association:
-	6.1 Associate measurements to tracks
+5. Track Management:    
+A multi-target tracking system has to fulfill the following tasks in addition to a single-target tracking:     
+	5.1 Initialize new tracks    
+      	- Before measurement can be tracked against tracks, track has to be initialized first, depending on first received measurement been camera or lidar, choice is at engineer's hand how to use populate the tracks, eg wait several measurement to initialize nad can get velocity as well or, disgard camera and wait for lidar so state has distance    
+![track_mgr_init_0](/summary_related/track_mgr_init_0.png)    
+    	- Covariance matrix also need to be initialized, based on sensor to vehicle transformation, also error term should also reflect the initial state, such as velocity estimation error can be larger to reflect the lack of velocity measurement update    
+![track_mgr_init_1](/summary_related/track_mgr_init_1.png)    
+	5.2 Delete old tracks    
+		- Tack management should also be able to delet old tracks that their score is below certain threshold to stop tracking    
+	5.3 Assign some confidence value to a track   
+     	- A track scoring system can help to keep track of tracks and provide metrics(confidence) for track deletion, many heuristic method is implemented here. approach implemented in this project is detection in the last 6 frames over number of frames(6), and a state name("initialized", "tentative", "confirmed") is assigned based on score and wether the track is new or not, and when to delete a track, this extra information is not mandantory but it can help the track management keep better track of things    
+![track_mgr_init_1](/summary_related/track_mgr_score.png)    
+6. Track/measurement Association:      
+	6.1 Associate measurements to tracks   
       	- Association handels which measurement to update with which track, it assumes each track originates from at most one track, and each track generate at most one measurement  
-![track_mgr_init_1](/summary_related/association_MHD_0.png)
+![track_mgr_init_1](/summary_related/association_MHD_0.png)   
         - This project uses Mahalanobis distance(MHD) to measure association, it incorprates the residual gamma(prediction state - measurement) and inverse of residual covariance S which is process covariance P transformed to maeasurement space plus measurement noise. so the smaller uncertainty result in less distance, more discussion about advanced association method is discussed in later section
-![track_mgr_init_1](/summary_related/association_MHD_0.png) 
-	6.2 visibility checks per each sensor's FOV 
+![track_mgr_init_1](/summary_related/association_MHD_0.png)    
+	6.2 visibility checks per each sensor's FOV   
       	- different sensor has differnet FOVs and to prevent score occilating due to situations where track is lack of measurement update due to out of FOV, the track management makes visibilty reasoning each track get updated, so for example when track is outside of camera FOV and track is not updated with maeasurement, the score is not going to be reduced.(probabilty reasoning to decide visibilty and also uses dynamic occolusion reasoning to handle dynamic situation)   
-![track_mgr_init_1](/summary_related/association_FOV.png)</br>
+![track_mgr_init_1](/summary_related/association_FOV.png)    
+
 	6.3 Probability based gating
       	- To further reduce the complexity to association, this project implemented **gating**, a measurement lies inside a track's gate if the Mahalanobis distance is smaller than the threshold calculated from the inverse cumulative **X^2(Chi-squared)** distribution. 
 ![track_mgr_init_1](/summary_related/association_gating.png)
