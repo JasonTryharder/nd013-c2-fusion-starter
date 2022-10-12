@@ -131,7 +131,10 @@ Notice all metrics should be perfect since detector is by passed and using groun
 ![RMSE_camera_lidar](/summary_related/RMSE_without_camera.png)    
 	8.3 Below video shows tracking algorithms, with left showing detection ground thruth, in the testing scenario, the vehicle is driving under realtive constant speed, which is similar to the motion model estimation, but it will face challenge in an AEB situation.    
 ![Tracking_video](/summary_related/Final-my-tracking-results.gif)    
-	8.4 The motion model assumes no limitation in terms of direction a car can drive, which in real scenario, the car can only drive in some limitted directions, by update with bicycle model, and constant acceleration motion model, the tracking performance can be improved further    
+	8.4 The motion model assumes no limitation in terms of direction a car can drive, which in real scenario, the car can only drive in some limitted directions, by update with bicycle model, and constant acceleration motion model, the tracking performance can be improved further   
+	8.5 Additional image showing single track tracking and management, this can be used for debug purposes   
+![step1_RMSE](/summary_related/RMSE_step_1.png)
+![step2_RMSE](/summary_related/RMSE_step_2.png)  
 
 ## Additional information  
 9. Data representation   
