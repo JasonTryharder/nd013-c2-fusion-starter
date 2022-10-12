@@ -1,25 +1,25 @@
 # Lidar and camera fusion  
 This project demonstrated a implementation of object detection using a trained model using complex-yolo or  , and tracking using EKF to fuse lidar and camera detections  
-![label_vs_detected_object_Thumbnail.png](/summary_related/label-vs-detected-object.gif)  
+![label_vs_detected_object_Thumbnail.png](/summary_related/label-vs-detected-object.gif)</br>  
 ### The following diagram illustrates the project data flow, and steps makes up the detection and tracking functions  
-![System_Detection_and_Tracking.png](/summary_related/System_Detection_and_Tracking.png) 
-![Tracking_flow_zoomin](/summary_related/EKF_flow.png) 
+![System_Detection_and_Tracking.png](/summary_related/System_Detection_and_Tracking.png)</br>
+![Tracking_flow_zoomin](/summary_related/EKF_flow.png)</br> 
 ### Setup for local environment 
 refer to instruction provided in this [link](https://github.com/JasonTryharder/nd013-c2-fusion-starter/blob/main/setup_README.md#installation-instructions-for-running-locally)
 ### Waymo AV sensor setup
 note: Waymo utilizes multiple sensors including multiple types of Lidar   
 	- x4 short range Perimeter Lidar, vertical -90 to +30 degree, 0-20M [link1](https://blog.waymo.com/2020/03/introducing-5th-generation-waymo-driver.html)  
 	- x1 360 Lidar, vertical -17.6 to +2.4 degree, <70M [link2](https://waymo.com/intl/zh-cn/waymo-one/?loc=sf)  
-![waymo_sensor_illustration.png](/summary_related/waymo_sensor_illustration.png)  
+![waymo_sensor_illustration.png](/summary_related/waymo_sensor_illustration.png)</br>  
 ### Detection tasks:  
 1.  Data visulization  
 Depend on the dataset/sensor set of choice, data format will vary, some exploratory analysis on the data is beneficial to understand the challenge of the project  
   	1.1 View the range images  
     	- This data structure holds 3d points as a 360 degree "photo" of the scanning environment with the row dimension denoting the elevation angle of the laser beam and the column dimension denoting the azimuth angle. With each incremental rotation around the z-axis, the lidar sensor returns a number of range and intensity measurements, which are then stored in the corresponding cells of the range image.  
     	- In the figure below(credit: [udacity](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/09368e69-a6e0-4109-b479-515cd7f5f518/concepts/0c8e77d9-163e-411d-a8fe-00cb3e40d7d0)), a point ***p*** in space is mapped into a range image cell, which is defined by azimuth angle ***alpha/yaw*** and inclination ***beta/pitch***, and inside each cell, it contains ***range,intensity,elongation and the vehicle pose***  
-![range_img_udacity.png](/summary_related/range_img_udacity.png)  
+![range_img_udacity.png](/summary_related/range_img_udacity.png)</br>  
 img shows range and intensity channel vertically stacked  
-[![range_img_step1_Thumbnail.png](/summary_related/range_img_step1_Thumbnail.png)](/summary_related/range_img_step1.gif)
+[![range_img_step1_Thumbnail.png](/summary_related/range_img_step1_Thumbnail.png)](/summary_related/range_img_step1.gif)</br>
 
 	2.2 View the pointcloud using open3d module  
 		With the help of spherical coordinates, also the extrinsic calibration of the top lidar, and transpose to vehicle coordinates, we can reconstruct x,y,z from range image
