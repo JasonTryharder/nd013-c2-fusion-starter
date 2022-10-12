@@ -108,30 +108,30 @@ A multi-target tracking system has to fulfill the following tasks in addition to
 - to decide whether an object exists in the scene and  
 - to determine the position, the orientation and the shape of the object  
 Average Precision (AP) metric was proposed as a suitable metric for object detection. 
-Several steps to implement the metrics :
-	7.1 Find pairings between ground-truth labels and detections by looking at label BB and detection BB IOUs, so that we can determine wether an object has been (a) missed (false negative), (b) successfully detected (true positive) or (c) has been falsely reported (false positive). 
-	7.2 Determine the number of false positives and false negatives for the current frame.And an overall performance after all frame have been processed 
-	7.3 Precision" and "recall" which are based on the accumulated number of positives and negatives from all frames will be calculated 
-	7.4 The idea of the average precision (AP) metric is to compact the information within the precision-recall curve into a single number, which can be used to easily compare algorithms with each other. This goal is achieved by summing the precision values for different (=11) equally spaced recall values:(illustrated thru the following figure)
-![AveragePrecision.png](/summary_related/AveragePrecision.png)
-	7.5 Based on the observation that changing the IoU threshold affects both precision and recall, the idea of the mean average precision (mAP) measure is to compute the AP scores for various IoU thresholds and then computing the mean from these values. The following figure shows precision-recall curves for several settings of the IoU threshold
-![mAP_illustration.png](/summary_related/mAP_illustration.png)
-	7.6 Plot showing computed detection precision, recall, IOU, positional errors on 100 frames from training_segment-1005081002024129653_5313_150_5333_150_with_camera_labels.tfrecord 
-![computePR_stats.png](/summary_related/computePR_stats.png)
-	7.7 A test on ground truth is also performed to validate the evaluation pipeline:
-Notice all metrics should be perfect since detector is by passed and using ground truth as detection result, but due to ***floating point precision***, some metrics shows some variation arround 1.  
-![computePR_stats_use_label.png](/summary_related/computePR_stats_use_label.png)
-	7.8 Below video demonstrates complex YOLO detection with labels(ground truth) drawn. Also note that in this project, we are only focussing on the detection of vehicles, even though the Waymo Open dataset contains labels for other road users as well.  
-![label_vs_detected_object_Thumbnail](/summary_related/label_vs_detected_object.gif)
+Several steps to implement the metrics :   
+	7.1 Find pairings between ground-truth labels and detections by looking at label BB and detection BB IOUs, so that we can determine wether an object has been (a) missed (false negative), (b) successfully detected (true positive) or (c) has been falsely reported (false positive).    
+	7.2 Determine the number of false positives and false negatives for the current frame.And an overall performance after all frame have been processed    
+	7.3 Precision" and "recall" which are based on the accumulated number of positives and negatives from all frames will be calculated    
+	7.4 The idea of the average precision (AP) metric is to compact the information within the precision-recall curve into a single number, which can be used to easily compare algorithms with each other. This goal is achieved by summing the precision values for different (=11) equally spaced recall values:(illustrated thru the following figure)   
+![AveragePrecision.png](/summary_related/AveragePrecision.png)    
+	7.5 Based on the observation that changing the IoU threshold affects both precision and recall, the idea of the mean average precision (mAP) measure is to compute the AP scores for various IoU thresholds and then computing the mean from these values. The following figure shows precision-recall curves for several settings of the IoU threshold    
+![mAP_illustration.png](/summary_related/mAP_illustration.png)    
+	7.6 Plot showing computed detection precision, recall, IOU, positional errors on 100 frames from    training_segment-1005081002024129653_5313_150_5333_150_with_camera_labels.tfrecord    
+![computePR_stats.png](/summary_related/computePR_stats.png)    
+	7.7 A test on ground truth is also performed to validate the evaluation pipeline:    
+Notice all metrics should be perfect since detector is by passed and using ground truth as detection result, but due to ***floating point precision***, some metrics shows some variation arround 1.    
+![computePR_stats_use_label.png](/summary_related/computePR_stats_use_label.png)    
+	7.8 Below video demonstrates complex YOLO detection with labels(ground truth) drawn. Also note that in this project, we are only focussing on the detection of vehicles, even though the Waymo Open dataset contains labels for other road users as well.     
+![label_vs_detected_object_Thumbnail](/summary_related/label_vs_detected_object.gif)   
 
-8. Tracking algorithm is tested using pre-recorded frames using **fpn_resnet only**, due to darknet model does not provide hight label, two test result is plotted: 
-	8.1 Use camera and lidar detection together, one can observe there are three tracks get consistent detection and tracking, the detection accuracy measured using RMSE can stay below 0.4 all the time, this definetly will help increase tracking robustness
-![RMSE_camera_lidar](/summary_related/RMSE_with_camera.png)
-	8.2 Use lidar alone the tracking algorithm still showed strong robustness, it tracks the same 3 tracks only with slight higher RMSE error, however, using extra sensor(lidar) is strongly preferred, since with more sensor can increase tracking capability for other object such as human, cyclist, animals. also, camera can provide more contextual information such as sementic infomation
-![RMSE_camera_lidar](/summary_related/RMSE_without_camera.png)
-	8.3 Below video shows tracking algorithms, with left showing detection ground thruth, in the testing scenario, the vehicle is driving under realtive constant speed, which is similar to the motion model estimation, but it will face challenge in an AEB situation.
-![Tracking_video](/summary_related/Final-my-tracking-results.gif)
-	8.4 The motion model assumes no limitation in terms of direction a car can drive, which in real scenario, the car can only drive in some limitted directions, by update with bicycle model, and constant acceleration motion model, the tracking performance can be improved further
+8. Tracking algorithm is tested using pre-recorded frames using **fpn_resnet only**, due to darknet model does not provide hight label, two test result is plotted:    
+	8.1 Use camera and lidar detection together, one can observe there are three tracks get consistent detection and tracking, the detection accuracy measured using RMSE can stay below 0.4 all the time, this definetly will help increase tracking robustness   
+![RMSE_camera_lidar](/summary_related/RMSE_with_camera.png)   
+	8.2 Use lidar alone the tracking algorithm still showed strong robustness, it tracks the same 3 tracks only with slight higher RMSE error, however, using extra sensor(lidar) is strongly preferred, since with more sensor can increase tracking capability for other object such as human, cyclist, animals. also, camera can provide more contextual information such as sementic infomation    
+![RMSE_camera_lidar](/summary_related/RMSE_without_camera.png)    
+	8.3 Below video shows tracking algorithms, with left showing detection ground thruth, in the testing scenario, the vehicle is driving under realtive constant speed, which is similar to the motion model estimation, but it will face challenge in an AEB situation.    
+![Tracking_video](/summary_related/Final-my-tracking-results.gif)    
+	8.4 The motion model assumes no limitation in terms of direction a car can drive, which in real scenario, the car can only drive in some limitted directions, by update with bicycle model, and constant acceleration motion model, the tracking performance can be improved further    
 
 ## Additional information  
 9. Data representation   
