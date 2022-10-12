@@ -45,7 +45,7 @@ Depend on the system architechture and the type of NN selected as detector, data
 Notice height and intensity channel have different emphasis on the detected objects  
         - Convert pcl to BEV(birds eye view) 
 ![BEV_stacked_img_step2](/summary_related/BEV_stacked_img_step2.gif)
-1. Detector  
+3. Detector  
 There is various processing pipeline for object detection and classification based on point-clouds. The pipeline structure summarized(credit: [Udacity](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/cbe1917f-ffe4-4b8c-87b8-11edb85d79ff/concepts/39e780c5-e37e-43ba-9b48-dca8b4a67a7d)) consists of three major steps, which are   
 	3.1 Data representation  
 	3.2 Feature extraction   
@@ -56,17 +56,17 @@ Below [chart](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modu
 4. Single track tracking thru EKF 
 Either Kalman filter or Extended-Kalman filter or Unsented Kalman filter all accomplish one goal: predict state estimate by a joint probability distribution for the states over each frame, at each frame it takes two step : prediction and measurement update.  
 Specifically kalman filter will perform the following: 
-	4.1 Calculate the time step **Delta t** and the new state transition matrix **F** and process noise covariance matrix **Q**.
-![KF_equ](/summary_related/KF_prediction.png)
+	4.1 Calculate the time step **Delta t** and the new state transition matrix **F** and process noise covariance matrix**Q** </br>
+![KF_equ](/summary_related/KF_prediction.png)</br>
 	4.2 Predict state and covariance to the **next timestamp**.
       	- Process noise is added based on driving situation, for example: high way driving and AEB(automatic emergency breaking) situations process noise will be different if we assume constant velocity, since the speed error will be much larger in AEB situation, updated prediction equ, factored in process noise nu
 ![KF_equ_more](/summary_related/KF_prediction_more.png) 
 ![KF_equ_more_1](/summary_related/KF_prediction_more_1.png) 
-	4.3 Transform the state from **vehicle** to **sensor** coordinates.
-   	    - Measurement update: 
-![KF_equ](/summary_related/KF_measurement.png)
+	4.3 Transform the state from **vehicle** to **sensor** coordinates </br>
+   	    - Measurement update: </br>
+![KF_equ](/summary_related/KF_measurement.png)</br>
         - measurement equation for camera from a 6D(x,y,z,vx,vy,vz) vector to 2D(x,y) is non-linear 
-![KF_measurement_camera_1](/summary_related/measurement_equ_camera_1.png)
+![KF_measurement_camera_1](/summary_related/measurement_equ_camera_1.png)</br>
 	4.4 In case of a camera measurement, use the **nonlinear measurement model** and calculate the new Jacobian, otherwise use the **linear measurement model** to update state and covariance.
 note: kalman filter assumes linear mapping matrix for the state transition matrix and measurement update matrix, EKF and UKF are ways to obtain a linear representation at non-linear situation, such as variant speed(with acceleration) or camera measurement model  
 note: to get a linear representation of non-linear equation, we used multivariant taylor expansion(first order), so there is a Jacobian matrix is needed for first exapnsion  
@@ -74,8 +74,8 @@ note: to get a linear representation of non-linear equation, we used multivarian
         - Below is a setup for 2x6 Jacobian
 ![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)
 ![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)
-        - KF parameter definition: 
-![KF_equ](/summary_related/KF_Definition.png)
+        - KF parameter definition: </br>
+![KF_equ](/summary_related/KF_Definition.png)</br>
 
 
 5. Track Management:
@@ -88,7 +88,7 @@ A multi-target tracking system has to fulfill the following tasks in addition to
 	5.2 Delete old tracks
 		- Tack management should also be able to delet old tracks that their score is below certain threshold to stop tracking
 	5.3 Assign some confidence value to a track
-     	- A track scoring system can help to keep track of tracks and provide metrics(confidence) for track deletion, many heuristic method is implemented here. approach implemented in this project is detection in the last 6 frames over number of frames(6), and a state name("initialized", "tentative", "confirmed") is assigned based on score and wether the track is new or not, and when to delete a track, this extra information is not mandantory but it can help the track management keep better track of things 
+     	- A track scoring system can help to keep track of tracks and provide metrics(confidence) for track deletion, many heuristic method is implemented here. approach implemented in this project is detection in the last 6 frames over number of frames(6), and a state name("initialized", "tentative", "confirmed") is assigned based on score and wether the track is new or not, and when to delete a track, this extra information is not mandantory but it can help the track management keep better track of things</br>
 ![track_mgr_init_1](/summary_related/track_mgr_score.png)
 6. Track/measurement Association:
 	6.1 Associate measurements to tracks
@@ -98,7 +98,7 @@ A multi-target tracking system has to fulfill the following tasks in addition to
 ![track_mgr_init_1](/summary_related/association_MHD_0.png) 
 	6.2 visibility checks per each sensor's FOV 
       	- different sensor has differnet FOVs and to prevent score occilating due to situations where track is lack of measurement update due to out of FOV, the track management makes visibilty reasoning each track get updated, so for example when track is outside of camera FOV and track is not updated with maeasurement, the score is not going to be reduced.(probabilty reasoning to decide visibilty and also uses dynamic occolusion reasoning to handle dynamic situation)   
-![track_mgr_init_1](/summary_related/association_FOV.png)
+![track_mgr_init_1](/summary_related/association_FOV.png)</br>
 	6.3 Probability based gating
       	- To further reduce the complexity to association, this project implemented **gating**, a measurement lies inside a track's gate if the Mahalanobis distance is smaller than the threshold calculated from the inverse cumulative **X^2(Chi-squared)** distribution. 
 ![track_mgr_init_1](/summary_related/association_gating.png)
