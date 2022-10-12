@@ -14,76 +14,76 @@ note: Waymo utilizes multiple sensors including multiple types of Lidar
 ### Detection tasks:  
 1.  Data visulization  
 Depend on the dataset/sensor set of choice, data format will vary, some exploratory analysis on the data is beneficial to understand the challenge of the project  
-  	1.1 View the range images  
+  	1.1 View the range images    
     	- This data structure holds 3d points as a 360 degree "photo" of the scanning environment with the row dimension denoting the elevation angle of the laser beam and the column dimension denoting the azimuth angle. With each incremental rotation around the z-axis, the lidar sensor returns a number of range and intensity measurements, which are then stored in the corresponding cells of the range image.  
     	- In the figure below(credit: [udacity](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/09368e69-a6e0-4109-b479-515cd7f5f518/concepts/0c8e77d9-163e-411d-a8fe-00cb3e40d7d0)), a point ***p*** in space is mapped into a range image cell, which is defined by azimuth angle ***alpha/yaw*** and inclination ***beta/pitch***, and inside each cell, it contains ***range,intensity,elongation and the vehicle pose***  
 ![range_img_udacity.png](/summary_related/range_img_udacity.png)</br>  
 img shows range and intensity channel vertically stacked  
 [![range_img_step1_Thumbnail.png](/summary_related/range_img_step1_Thumbnail.png)](/summary_related/range_img_step1.gif)</br>
 
-	2.2 View the pointcloud using open3d module  
-		With the help of spherical coordinates, also the extrinsic calibration of the top lidar, and transpose to vehicle coordinates, we can reconstruct x,y,z from range image
-	2.3 By analyzing a few point cloud images, notice:   
-    	- Preceeding vehicles rear bumper receives most signals, features are most reliable in a frame by frame basis  
-![show_pcl_20-54-51.png](/summary_related/show_pcl_20-54-51.png)   
-    	- Transparent objects like tail lights, windshields do not reflect well on lidar beams, features are not reliable in a frame by frame basis  
-![show_pcl_20-51-34.png](/summary_related/show_pcl_20-51-34.png)  
-    	- Due to limited angular resolution, further away from the ego vehicle, the bind spots will increase, at a point, smaller objects like pedestrain, cyclist will be hidden in between  
-    	- Due to mounting position and viewing angle of the lidar, ego vehicle proximity presents a significant amount of blind spots, which will be addressed via perimeter lidar, this area's detection is important in making change lane maneuvers  
-    	- Lidar data also showed enough accuracy to differenciate lane sperations in the middle 
-![show_pcl_20-52-50.png](/summary_related/show_pcl_20-52-50.png)  
+	1.2 View the pointcloud using open3d module    
+		With the help of spherical coordinates, also the extrinsic calibration of the top lidar, and transpose to vehicle coordinates, we can reconstruct x,y,z from range image   
+	1.3 By analyzing a few point cloud images, notice:     
+    	- Preceeding vehicles rear bumper receives most signals, features are most reliable in a frame by frame basis    
+![show_pcl_20-54-51.png](/summary_related/show_pcl_20-54-51.png)     
+    	- Transparent objects like tail lights, windshields do not reflect well on lidar beams, features are not reliable in a frame by frame basis    
+![show_pcl_20-51-34.png](/summary_related/show_pcl_20-51-34.png)    
+    	- Due to limited angular resolution, further away from the ego vehicle, the bind spots will increase, at a point, smaller objects like pedestrain, cyclist will be hidden in between    
+    	- Due to mounting position and viewing angle of the lidar, ego vehicle proximity presents a significant amount of blind spots, which will be addressed via perimeter lidar, this area's detection is important in making change lane maneuvers    
+    	- Lidar data also showed enough accuracy to differenciate lane sperations in the middle    
+![show_pcl_20-52-50.png](/summary_related/show_pcl_20-52-50.png)    
 
-2. Data preprocessing  
-Depend on the system architechture and the type of NN selected as detector, data collected from sensor(raw data) need to be processed to fit pipline, various operations including:  
-	2.1 Crop the view to focus on predefined region   
-	2.2 Map each individual channel of range image to 8bit data and threshold the object of interest to the middle part of dynamic range( by eliminating lidar registed data outliers)  
-	2.3 Convert range image(Waymo data format) to pcl( point cloud)  
-        - Below shows **intensity** channel of cropped, 8bit image consist of the BEV image   
-![BEV_intensity_img_step2](/summary_related/BEV-intensity-img-step2.gif)  
-        - Below shows **height** channel of cropped, 8bit image consist of the BEV image   
-![BEV_height_img_step2](/summary_related/BEV_height_img_step2.gif)  
-Notice height and intensity channel have different emphasis on the detected objects  
-        - Convert pcl to BEV(birds eye view) 
-![BEV_stacked_img_step2](/summary_related/BEV_stacked_img_step2.gif)
-3. Detector  
-There is various processing pipeline for object detection and classification based on point-clouds. The pipeline structure summarized(credit: [Udacity](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/cbe1917f-ffe4-4b8c-87b8-11edb85d79ff/concepts/39e780c5-e37e-43ba-9b48-dca8b4a67a7d)) consists of three major steps, which are   
+2. Data preprocessing    
+Depend on the system architechture and the type of NN selected as detector, data collected from sensor(raw data) need to be processed to fit pipline, various operations including:    
+	2.1 Crop the view to focus on predefined region    
+	2.2 Map each individual channel of range image to 8bit data and threshold the object of interest to the middle part of dynamic range( by eliminating lidar registed data outliers)    
+	2.3 Convert range image(Waymo data format) to pcl( point cloud)    
+        - Below shows **intensity** channel of cropped, 8bit image consist of the BEV image     
+![BEV_intensity_img_step2](/summary_related/BEV-intensity-img-step2.gif)    
+        - Below shows **height** channel of cropped, 8bit image consist of the BEV image     
+![BEV_height_img_step2](/summary_related/BEV_height_img_step2.gif)    
+Notice height and intensity channel have different emphasis on the detected objects    
+        - Convert pcl to BEV(birds eye view)   
+![BEV_stacked_img_step2](/summary_related/BEV_stacked_img_step2.gif)   
+3. Detector    
+There is various processing pipeline for object detection and classification based on point-clouds. The pipeline structure summarized(credit: [Udacity](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/cbe1917f-ffe4-4b8c-87b8-11edb85d79ff/concepts/39e780c5-e37e-43ba-9b48-dca8b4a67a7d)) consists of three major steps, which are     
 	3.1 Data representation  
 	3.2 Feature extraction   
 	3.3 Model-based detection.  
-Below [chart](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/cbe1917f-ffe4-4b8c-87b8-11edb85d79ff/concepts/39e780c5-e37e-43ba-9b48-dca8b4a67a7d) is a data flow with pcl as input and classified and detected object as output  
-![3d-objectDetection-pipeline.png](/summary_related/3d-objectDetection-pipeline.png)  
-### Step 2 tracking tasks :
-4. Single track tracking thru EKF 
-Either Kalman filter or Extended-Kalman filter or Unsented Kalman filter all accomplish one goal: predict state estimate by a joint probability distribution for the states over each frame, at each frame it takes two step : prediction and measurement update.  
-Specifically kalman filter will perform the following: 
-	4.1 Calculate the time step **Delta t** and the new state transition matrix **F** and process noise covariance matrix**Q** </br>
-![KF_equ](/summary_related/KF_prediction.png)</br>
-	4.2 Predict state and covariance to the **next timestamp**.
+Below [chart](https://classroom.udacity.com/nanodegrees/nd0013/parts/cd2690/modules/d3a07469-74b5-49c2-9c0e-3218c3ecd016/lessons/cbe1917f-ffe4-4b8c-87b8-11edb85d79ff/concepts/39e780c5-e37e-43ba-9b48-dca8b4a67a7d) is a data flow with pcl as input and classified and detected object as output    
+![3d-objectDetection-pipeline.png](/summary_related/3d-objectDetection-pipeline.png)    
+### Step 2 tracking tasks :   
+4. Single track tracking thru EKF    
+Either Kalman filter or Extended-Kalman filter or Unsented Kalman filter all accomplish one goal: predict state estimate by a joint probability distribution for the states over each frame, at each frame it takes two step : prediction and measurement update.    
+Specifically kalman filter will perform the following:   
+	4.1 Calculate the time step **Delta t** and the new state transition matrix **F** and process noise covariance matrix**Q**    
+![KF_equ](/summary_related/KF_prediction.png)    
+	4.2 Predict state and covariance to the **next timestamp**.    
       	- Process noise is added based on driving situation, for example: high way driving and AEB(automatic emergency breaking) situations process noise will be different if we assume constant velocity, since the speed error will be much larger in AEB situation, updated prediction equ, factored in process noise nu
 ![KF_equ_more](/summary_related/KF_prediction_more.png) 
 ![KF_equ_more_1](/summary_related/KF_prediction_more_1.png) 
-	4.3 Transform the state from **vehicle** to **sensor** coordinates </br>
-   	    - Measurement update: </br>
-![KF_equ](/summary_related/KF_measurement.png)</br>
-        - measurement equation for camera from a 6D(x,y,z,vx,vy,vz) vector to 2D(x,y) is non-linear 
-![KF_measurement_camera_1](/summary_related/measurement_equ_camera_1.png)    
-	4.4 In case of a camera measurement, use the **nonlinear measurement model** and calculate the new Jacobian, otherwise use the **linear measurement model** to update state and covariance.
+	4.3 Transform the state from **vehicle** to **sensor** coordinates    
+   	    - Measurement update:    
+![KF_equ](/summary_related/KF_measurement.png)   
+        - measurement equation for camera from a 6D(x,y,z,vx,vy,vz) vector to 2D(x,y) is non-linear     
+![KF_measurement_camera_1](/summary_related/measurement_equ_camera_1.png)     
+	4.4 In case of a camera measurement, use the **nonlinear measurement model** and calculate the new Jacobian, otherwise use the **linear measurement model** to update state and covariance.   
 note: kalman filter assumes linear mapping matrix for the state transition matrix and measurement update matrix, EKF and UKF are ways to obtain a linear representation at non-linear situation, such as variant speed(with acceleration) or camera measurement model  
 note: to get a linear representation of non-linear equation, we used multivariant taylor expansion(first order), so there is a Jacobian matrix is needed for first exapnsion     
-![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)
-        - Below is a setup for 2x6 Jacobian
-![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)
-![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)
-        - KF parameter definition:     
+![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)   
+        - Below is a setup for 2x6 Jacobian    
+![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)   
+![KF_measurement_Taylo](/summary_related/measurement_equ_Taylor_0.png)   
+        - KF parameter definition:      
 ![KF_equ](/summary_related/KF_Definition.png)     
 
 
 5. Track Management:    
-A multi-target tracking system has to fulfill the following tasks in addition to a single-target tracking:     
-	5.1 Initialize new tracks    
-      	- Before measurement can be tracked against tracks, track has to be initialized first, depending on first received measurement been camera or lidar, choice is at engineer's hand how to use populate the tracks, eg wait several measurement to initialize nad can get velocity as well or, disgard camera and wait for lidar so state has distance    
-![track_mgr_init_0](/summary_related/track_mgr_init_0.png)    
-    	- Covariance matrix also need to be initialized, based on sensor to vehicle transformation, also error term should also reflect the initial state, such as velocity estimation error can be larger to reflect the lack of velocity measurement update    
+A multi-target tracking system has to fulfill the following tasks in addition to a single-target tracking:      
+	5.1 Initialize new tracks     
+      	- Before measurement can be tracked against tracks, track has to be initialized first, depending on first received measurement been camera or lidar, choice is at engineer's hand how to use populate the tracks, eg wait several measurement to initialize nad can get velocity as well or, disgard camera and wait for lidar so state has distance     
+![track_mgr_init_0](/summary_related/track_mgr_init_0.png)     
+    	- Covariance matrix also need to be initialized, based on sensor to vehicle transformation, also error term should also reflect the initial state, such as velocity estimation error can be larger to reflect the lack of velocity measurement update     
 ![track_mgr_init_1](/summary_related/track_mgr_init_1.png)    
 	5.2 Delete old tracks    
 		- Tack management should also be able to delet old tracks that their score is below certain threshold to stop tracking    
@@ -94,20 +94,19 @@ A multi-target tracking system has to fulfill the following tasks in addition to
 	6.1 Associate measurements to tracks   
       	- Association handels which measurement to update with which track, it assumes each track originates from at most one track, and each track generate at most one measurement  
 ![track_mgr_init_1](/summary_related/association_MHD_0.png)   
-        - This project uses Mahalanobis distance(MHD) to measure association, it incorprates the residual gamma(prediction state - measurement) and inverse of residual covariance S which is process covariance P transformed to maeasurement space plus measurement noise. so the smaller uncertainty result in less distance, more discussion about advanced association method is discussed in later section
+        - This project uses Mahalanobis distance(MHD) to measure association, it incorprates the residual gamma(prediction state - measurement) and inverse of residual covariance S which is process covariance P transformed to maeasurement space plus measurement noise. so the smaller uncertainty result in less distance, more discussion about advanced association method is discussed in later section    
 ![track_mgr_init_1](/summary_related/association_MHD_0.png)    
-	6.2 visibility checks per each sensor's FOV   
-      	- different sensor has differnet FOVs and to prevent score occilating due to situations where track is lack of measurement update due to out of FOV, the track management makes visibilty reasoning each track get updated, so for example when track is outside of camera FOV and track is not updated with maeasurement, the score is not going to be reduced.(probabilty reasoning to decide visibilty and also uses dynamic occolusion reasoning to handle dynamic situation)   
-![track_mgr_init_1](/summary_related/association_FOV.png)    
-
-	6.3 Probability based gating
-      	- To further reduce the complexity to association, this project implemented **gating**, a measurement lies inside a track's gate if the Mahalanobis distance is smaller than the threshold calculated from the inverse cumulative **X^2(Chi-squared)** distribution. 
-![track_mgr_init_1](/summary_related/association_gating.png)
+	6.2 visibility checks per each sensor's FOV    
+      	- different sensor has differnet FOVs and to prevent score occilating due to situations where track is lack of measurement update due to out of FOV, the track management makes visibilty reasoning each track get updated, so for example when track is outside of camera FOV and track is not updated with maeasurement, the score is not going to be reduced.(probabilty reasoning to decide visibilty and also uses dynamic occolusion reasoning to handle dynamic situation)    
+![track_mgr_init_1](/summary_related/association_FOV.png)     
+	6.3 Probability based gating   
+      	- To further reduce the complexity to association, this project implemented **gating**, a measurement lies inside a track's gate if the Mahalanobis distance is smaller than the threshold calculated from the inverse cumulative **X^2(Chi-squared)** distribution.    
+![track_mgr_init_1](/summary_related/association_gating.png)   
 
 ## Evaluation
-7. Object detection algorithms need to perform two main tasks, which are
-- to decide whether an object exists in the scene and
-- to determine the position, the orientation and the shape of the object
+7. Object detection algorithms need to perform two main tasks, which are    
+- to decide whether an object exists in the scene and  
+- to determine the position, the orientation and the shape of the object  
 Average Precision (AP) metric was proposed as a suitable metric for object detection. 
 Several steps to implement the metrics :
 	7.1 Find pairings between ground-truth labels and detections by looking at label BB and detection BB IOUs, so that we can determine wether an object has been (a) missed (false negative), (b) successfully detected (true positive) or (c) has been falsely reported (false positive). 
